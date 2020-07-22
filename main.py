@@ -11,10 +11,13 @@ with open("phonebook_raw.csv", encoding='utf-8') as f:
 def corrected_names(data):
     name_list = []
     pattern = re.compile(r'^([а-яА-Я]+)[,|\s]([а-яА-Я]+)[,|\s]([а-яА-Я]+|)')
-    # replace_names = r'\1, \2, \3'
     for people in data:
-        people = ','.join(people)
-        result = pattern.sub(r'\1, \2, \3', people).split(',')
+        contact = ','.join(people)
+        result = pattern.sub(r'\1, \2, \3', contact).split(',')
+        if not result[4]:
+            result.pop(4)
+        if not result[3]:
+            result.pop(3)
         name_list.append(result)
     return name_list
 
@@ -22,10 +25,9 @@ def corrected_names(data):
 def corrected_numbers(data):
     phone_list = []
     pattern = re.compile(r'(\+7|8)\s*\(?(\d{3})\)?(\s*|.)(\d{3})(\s*|.)(\d{2}).?(\d{2})\s*(\(?(доб\.)\s*(\d+)\)?)?')
-    replace_numbers = r'+7(\2)\4-\6-\7 \9\10'
     for people in data:
-        people = ','.join(people)
-        result = pattern.sub(replace_numbers, people).split(',')
+        contact = ','.join(people)
+        result = pattern.sub(r'+7(\2)\4-\6-\7 \9\10', contact).split(',')
         phone_list.append(result)
     return phone_list
 
@@ -46,7 +48,7 @@ def delete_copies(data):
         else:
             contact_dict[contacts[0]] = data.index(contacts)
 
-    return contacts_list
+    return data
 
 
 corrected_contacts_list = delete_copies(corrected_numbers(corrected_names(contacts_list)))
